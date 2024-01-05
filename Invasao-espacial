@@ -3,7 +3,7 @@ from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint
 from time import sleep
 
-print('Invasão Espacial, versão beta: 0.1')
+print('Invasão Espacial, versão beta: 0.2')
 
 q = 0
 nivel = 0
@@ -73,7 +73,7 @@ class Tiro(Sprite):
         self.rect.centerx = x
         self.rect.bottom = y
 
-        self.velocidade = 3
+        self.velocidade = 5
 
     def update(self):
         self.rect.y -= self.velocidade
@@ -132,9 +132,6 @@ class Jogador(Sprite):
 class Virus(Sprite):
     def __init__(self):
         super().__init__()
-
-        global nivel
-
         self.velocidade = 1
         self.image = pygame.image.load('game-python-imagens/inimigo_1.png')
         self.rect = self.image.get_rect(
@@ -142,15 +139,16 @@ class Virus(Sprite):
         )
         if pontos < 80:
             self.velocidade = 1
-        elif 100 > pontos > 80:
+        elif pontos > 80:
             self.velocidade = 1.5
-            nivel = 4
-        elif 100 < pontos < 120:
+        elif pontos > 100:
             self.velocidade = 2
-            nivel = 5
-        elif pontos >= 140:
+        elif pontos > 120:
             self.velocidade = 2.5
-            nivel = 6
+        elif pontos > 160:
+            self.velocidade = 3
+        elif pontos > 200:
+            self.velocidade = 3.5
 
     def update(self):
         self.rect.y += self.velocidade
@@ -176,7 +174,7 @@ jogo_perdido = False
 
 while loop:
 
-    if pontos <= 20:
+    if pontos < 21:
         if q < 3:
             grupo_inimigos.add(Virus())
             q += 1
@@ -198,6 +196,33 @@ while loop:
             grupo_inimigos.add(Virus())
             q += 1
         nivel = 3
+
+    if pontos > 80:
+        nivel = 4
+
+    if pontos > 100:
+        nivel = 5
+
+    if pontos > 120:
+        nivel = 6
+
+    if pontos > 140:
+        nivel = 7
+        if q < 7:
+            grupo_inimigos.add(Virus())
+            q += 1
+
+    if pontos > 160:
+        nivel = 8
+
+    if pontos > 180:
+        nivel = 9
+        if q < 8:
+            grupo_inimigos.add(Virus())
+            q += 1
+
+    if pontos > 200:
+        nivel = 10
 
     clock.tick(120)
 
