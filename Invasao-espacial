@@ -67,7 +67,7 @@ tela_inicial()
 class Tiro(Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load('game-python-imagens/toast_small.png')
+        self.image = pygame.image.load('Game-images/toast_small.png')
         self.rect = self.image.get_rect(center=(x, y))
 
         self.rect.centerx = x
@@ -133,7 +133,7 @@ class Virus(Sprite):
     def __init__(self):
         super().__init__()
         self.velocidade = 1
-        self.image = pygame.image.load('game-python-imagens/inimigo_1.png')
+        self.image = pygame.image.load('Game-images/inimigo_1.png')
         self.rect = self.image.get_rect(
             center=(randint(20, 800), 0)
         )
