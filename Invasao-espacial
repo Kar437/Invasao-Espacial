@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint
 
-print('Invasão Espacial, versão beta: 0.3')
+print('Invasão Espacial, versão beta: 0.4')
 
 q = 0
 nivel = 0
@@ -30,8 +30,8 @@ pontos = 0
 class Tela_inicial():
     def __init__(self):
         self.rodando = True
-        self.botão = Botao(esverdeado, 320, 400, 150, 50, 'Jogar')
-
+        self.botão = Botao(esverdeado, 320, 355, 150, 50, 'Jogar')
+        self.ajuda = Botao(esverdeado, 320, 455, 150, 50, 'Ajuda')
 
     def executar(self):
         while self.rodando:
@@ -39,6 +39,7 @@ class Tela_inicial():
             titulo = fonte_titulo.render("Invasão Espacial", True, 'white')
             superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
             self.botão.desenhar(superficie)
+            self.ajuda.desenhar(superficie)
             pygame.display.flip()
 
             for evento in pygame.event.get():
@@ -52,7 +53,48 @@ class Tela_inicial():
                     if self.botão.estar_sobre_pos(mouse_pos):
                         print('ok')
                         self.rodando = False
+                    if self.ajuda.estar_sobre_pos(mouse_pos):
+                        print('ok')
+                        como_jogar = Como_jogar()
+                        como_jogar.executar()
 
+
+class Como_jogar():
+    def __init__(self):
+        self.rodando = True
+        self.voltar = Botao(esverdeado, 320, 500, 150, 50, 'Voltar')
+
+    def executar(self):
+        while self.rodando:
+            superficie.fill(preto)
+
+            titulo = fonte_titulo.render('Como jogar', True, 'white')
+            texto1 = fonte.render('-Utilize as setas do teclado para movimentar a nave;', True, 'white')
+            texto2 = fonte.render('-Utilize espaço para atirar;', True, 'white')
+            texto3 = fonte.render('-Cada abate conta um (1) ponto;', True, 'white')
+            texto4 = fonte.render('-Cada virus que deixar passar desconta um (1) ponto;', True, 'white')
+            texto5 = fonte.render('-Quanto maior for sua pontuação, maior será a dificuldade;', True, 'white')
+            texto6 = fonte.render('-Obejetivo: eliminar a maior quantidade de vírus possivel.', True, 'white')
+
+            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            superficie.blit(texto1, (50, 100))
+            superficie.blit(texto2, (50, 125))
+            superficie.blit(texto3, (50, 150))
+            superficie.blit(texto4, (50, 175))
+            superficie.blit(texto5, (50, 200))
+            superficie.blit(texto6, (50, 225))
+
+            self.voltar.desenhar(superficie)
+
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.voltar.estar_sobre_pos(mouse_pos):
+                        print('voltar')
+                        self.rodando = False
 
 def game_over():
     rodando = True
@@ -98,6 +140,7 @@ class Botao():
 
 tela_inicial = Tela_inicial()
 tela_inicial.executar()
+ajuda = Como_jogar()
 
 class Tiro(Sprite):
     def __init__(self, x, y):
