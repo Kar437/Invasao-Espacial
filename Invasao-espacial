@@ -1,9 +1,8 @@
 import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint
-from time import sleep
 
-print('Invasão Espacial, versão beta: 0.2')
+print('Invasão Espacial, versão beta: 0.3')
 
 q = 0
 nivel = 0
@@ -11,6 +10,9 @@ nivel = 0
 loop = True
 
 preto = (0, 0, 0)
+picton_blue = (57, 183, 255)
+cinza = (128, 128, 128)
+esverdeado = (106, 120, 107)
 
 tamanho_tela = 800, 600
 superficie = pygame.display.set_mode(tamanho_tela)
@@ -25,22 +27,31 @@ fonte_titulo = pygame.font.SysFont(None, 50)
 pontos = 0
 
 
-def tela_inicial():
-    rodando = True
-    while rodando:
-        superficie.fill(preto)
-        titulo = fonte_titulo.render("Invasão Espacial", True, 'white')
-        iniciar = fonte.render('Pressione ESPAÇO para jogar', False, 'white')
-        superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
-        superficie.blit(iniciar, (tamanho_tela[0] // 2 - iniciar.get_width() // 2, 500))
-        pygame.display.flip()
+class Tela_inicial():
+    def __init__(self):
+        self.rodando = True
+        self.botão = Botao(esverdeado, 320, 400, 150, 50, 'Jogar')
 
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                rodando = False
-            elif evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_SPACE:  # Pressione a tecla espaço para começar o jogo
-                    rodando = False
+
+    def executar(self):
+        while self.rodando:
+            superficie.fill(preto)
+            titulo = fonte_titulo.render("Invasão Espacial", True, 'white')
+            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            self.botão.desenhar(superficie)
+            pygame.display.flip()
+
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    quit()
+                elif evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_SPACE:  # Pressione a tecla espaço para começar o jogo
+                        rodando = False
+                elif evento.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.botão.estar_sobre_pos(mouse_pos):
+                        print('ok')
+                        self.rodando = False
 
 
 def game_over():
@@ -62,7 +73,31 @@ def game_over():
                     rodando = False
 
 
-tela_inicial()
+class Botao():
+    def __init__(self, cor, x, y, largura, altura, texto=''):
+        self.cor = cor
+        self.x = x
+        self.y = y
+        self.largura = largura
+        self.altura = altura
+        self.texto = texto
+
+    def desenhar(self, superficie):
+        pygame.draw.rect(superficie, self.cor, (self.x, self.y, self.largura, self.altura))
+        if self.texto != '':
+            fonte_botao = pygame.font.SysFont(None, 50)
+            texto = fonte_botao.render(self.texto, 1, 'green')
+            superficie.blit(texto, (self.x + (self.largura / 2 - texto.get_width() / 2),
+                                    self.y + (self.altura / 2 - texto.get_height() / 2)))
+
+    def estar_sobre_pos(self, pos):
+        if self.x < pos[0] < self.x + self.largura and self.y < pos[1] < self.y + self.altura:
+            return True
+        return False
+
+
+tela_inicial = Tela_inicial()
+tela_inicial.executar()
 
 class Tiro(Sprite):
     def __init__(self, x, y):
@@ -261,7 +296,7 @@ while loop:
     texto_pontos = fonte.render(f'Pontos: {pontos}', True, 'white')
     texto_nivel = fonte.render(f'Nivel: {nivel}', True, (255, 255, 255))
 
-    superficie.blit(texto_pontos, (10,10))
+    superficie.blit(texto_pontos, (10, 10))
     superficie.blit(texto_nivel, (10, 40))
 
     pygame.display.update()
