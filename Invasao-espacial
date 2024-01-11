@@ -45,9 +45,6 @@ class Tela_inicial():
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     quit()
-                elif evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_SPACE:  # Pressione a tecla espaço para começar o jogo
-                        rodando = False
                 elif evento.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     if self.botão.estar_sobre_pos(mouse_pos):
@@ -96,24 +93,41 @@ class Como_jogar():
                         print('voltar')
                         self.rodando = False
 
-def game_over():
-    rodando = True
-    while rodando:
-        superficie.fill(preto)
-        perdeu = fonte_titulo.render('Game over!', True, 'white')
-        pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
-        superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, tamanho_tela[1] // 2 - perdeu.get_width() // 2 ))
-        superficie.blit(pontuação, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 500))
-        pygame.display.flip()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    rodando = False
+class game_over():
+    def __init__(self, tela_inicial):
+        self.rodando = True
+        self.recomeçar = Botao(esverdeado, 320, 370, 150, 50, 'jogar')
+        self.sair = Botao(esverdeado, 320, 470, 150, 50, 'Sair')
+        self.tela_inicial = tela_inicial
 
+    def executar(self):
+        while self.rodando:
+            superficie.fill(preto)
+
+            perdeu = fonte_titulo.render('Game over!', True, 'white')
+            pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
+
+            self.recomeçar.desenhar(superficie)
+            self.sair.desenhar(superficie)
+
+            superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, tamanho_tela[1] // 2 - perdeu.get_width() // 2 ))
+            superficie.blit(pontuação, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 300))
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.sair.estar_sobre_pos(mouse_pos):
+                        self.rodando = False
+                    if self.recomeçar.estar_sobre_pos(mouse_pos):
+                        self.rodando = False
+                        self.tela_inicial.executar()
+                        print('ok')
 
 class Botao():
     def __init__(self, cor, x, y, largura, altura, texto=''):
@@ -141,6 +155,8 @@ class Botao():
 tela_inicial = Tela_inicial()
 tela_inicial.executar()
 ajuda = Como_jogar()
+game_over = game_over(tela_inicial)
+
 
 class Tiro(Sprite):
     def __init__(self, x, y):
@@ -333,7 +349,7 @@ while loop:
 
     if colisoes:
         loop = False
-        game_over()
+        game_over.executar()
         print(f'Pontuação: {pontos}')
 
     texto_pontos = fonte.render(f'Pontos: {pontos}', True, 'white')
