@@ -97,7 +97,6 @@ class Como_jogar():
 class game_over():
     def __init__(self, tela_inicial):
         self.rodando = True
-        self.recomeçar = Botao(esverdeado, 320, 370, 150, 50, 'jogar')
         self.sair = Botao(esverdeado, 320, 470, 150, 50, 'Sair')
         self.tela_inicial = tela_inicial
 
@@ -108,7 +107,6 @@ class game_over():
             perdeu = fonte_titulo.render('Game over!', True, 'white')
             pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
 
-            self.recomeçar.desenhar(superficie)
             self.sair.desenhar(superficie)
 
             superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, tamanho_tela[1] // 2 - perdeu.get_width() // 2 ))
@@ -124,7 +122,6 @@ class game_over():
                     mouse_pos = pygame.mouse.get_pos()
                     if self.sair.estar_sobre_pos(mouse_pos):
                         self.rodando = False
-                    if self.recomeçar.estar_sobre_pos(mouse_pos):
                         self.rodando = False
                         self.tela_inicial.executar()
                         print('ok')
