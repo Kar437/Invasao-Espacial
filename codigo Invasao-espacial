@@ -1,35 +1,41 @@
+# Importa as bibliotecas necessárias
 import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
 print('Invasão Espacial, versão: 1.0')
 
+# Variáveis de controle de power-up de tiro
 powerUp_tiro_ativo = False
 powerUp_tiro_timer = 0
 
-q = 0
-nivel = 0
+''' Variáveis de controle do jogo '''
+q = 0           # Contador de inimigos
+nivel = 0       # Nivel do jogo
+pontos = 0      # Pontuação do jogador
+loop = True     # Variável que controla o loop principal do jogo
 
-loop = True
-
+''' Cores utilizadas no jogo '''
 preto = (0, 0, 0)
 picton_blue = (57, 183, 255)
 cinza = (128, 128, 128)
 esverdeado = (106, 120, 107)
 
+# Configurações principais da tela do jogo
 tamanho_tela = 800, 600
 superficie = pygame.display.set_mode(tamanho_tela)
 pygame.display.set_caption('Invasão Espacial')
 
+# Carrega a imagem do fundo do jogo
 fundo = pygame.transform.scale(pygame.image.load('Game-images/space.jpg'), tamanho_tela)
 
+# Cria as fontes utilizadas no jogo
 pygame.font.init()
 fonte = pygame.font.SysFont(None, 30)
 fonte_titulo = pygame.font.SysFont(None, 50)
 
-pontos = 0
 
-
+# Cria o Power-up de tiro tripo
 class PowerUp_tiro(Sprite):
     def __init__(self):
         super().__init__()
@@ -44,7 +50,7 @@ class PowerUp_tiro(Sprite):
             self.kill()
 
 
-
+# Cria a tela inicial do jogo
 class Tela_inicial():
     def __init__(self):
         self.rodando = True
@@ -72,6 +78,7 @@ class Tela_inicial():
                         como_jogar.executar()
 
 
+# cria a janela de ajuda do Menu principal do jogo
 class Como_jogar():
     def __init__(self):
         self.rodando = True
@@ -109,6 +116,7 @@ class Como_jogar():
                         self.rodando = False
 
 
+# Cria a tela de game-over
 class game_over():
     def __init__(self, ):
         self.loop_executando = True
@@ -138,7 +146,7 @@ class game_over():
                         self.loop_executando = False
 
 
-
+# classe que cria os botões
 class Botao():
     def __init__(self, cor, x, y, largura, altura, texto=''):
         self.cor = cor
@@ -148,6 +156,7 @@ class Botao():
         self.altura = altura
         self.texto = texto
 
+    # Método para desenhar os botões na tela
     def desenhar(self, superficie):
         pygame.draw.rect(superficie, self.cor, (self.x, self.y, self.largura, self.altura))
         if self.texto != '':
@@ -156,18 +165,21 @@ class Botao():
             superficie.blit(texto, (self.x + (self.largura / 2 - texto.get_width() / 2),
                                     self.y + (self.altura / 2 - texto.get_height() / 2)))
 
+    # Método para verificar se o mouse está sobre o botão
     def estar_sobre_pos(self, pos):
         if self.x < pos[0] < self.x + self.largura and self.y < pos[1] < self.y + self.altura:
             return True
         return False
 
 
+# Cria instancia das classes acima
 tela_inicial = Tela_inicial()
 tela_inicial.executar()
 ajuda = Como_jogar()
 game_over = game_over()
 
 
+# Cria o tiro disparado pelo jogador
 class Tiro(Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -188,6 +200,7 @@ class Tiro(Sprite):
             self.kill()
 
 
+# Cria a nave controlada pelo jogador
 class Jogador(Sprite):
     def __init__(self, tiros):
         super().__init__()
@@ -204,6 +217,7 @@ class Jogador(Sprite):
 
     def update(self):
 
+        # Controla o movimento do jogador
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT]:
@@ -227,11 +241,13 @@ class Jogador(Sprite):
         if self.rect.y > 600 - 80:
             self.rect.y = 600 - 80
 
+    # Método que faz o jogador atirar
     def atirar(self):
         global tirosQ
         if len(self.tiros) < 3:
             self.tiros.add(Tiro(self.rect.centerx, self.rect.top))
 
+    # Método que faz o jogador atirar triplo (Quando powwer-up ativo)
     def atirar_triplo(self):
         if len(self.tiros) < 9:
             self.tiros.add(Tiro(self.rect.centerx - 50, self.rect.top))
@@ -239,6 +255,7 @@ class Jogador(Sprite):
             self.tiros.add(Tiro(self.rect.centerx + 50, self.rect.top))
 
 
+# Cria o vírus (Inimigo)
 class Virus(Sprite):
     def __init__(self):
         super().__init__()
@@ -247,6 +264,7 @@ class Virus(Sprite):
         self.rect = self.image.get_rect(
             center=(randint(20, 800), 0)
         )
+        # Ajusta a velocidade com base na pontuação
         if pontos < 80:
             self.velocidade = 1
         elif pontos > 80:
@@ -260,10 +278,12 @@ class Virus(Sprite):
         elif pontos > 200:
             self.velocidade = 3.5
 
+        # Gera um power-up com certa probalidade
         if random() < 0.07:
             if len(grupo_powerUp) < 1 and powerUp_tiro_ativo == False:
                 self.gerar_powerUp_tiro()
 
+    # Método que gera o power-up de tiro
     def gerar_powerUp_tiro(self):
         powerup = PowerUp_tiro()
         grupo_powerUp.add(powerup)
@@ -279,6 +299,7 @@ class Virus(Sprite):
             pontos -= 1
 
 
+# Cria grupos de sprites
 grupo_powerUp = Group()
 grupo_tiro = Group()
 grupo_inimigos = Group()
@@ -287,12 +308,15 @@ grupo_jogador = GroupSingle(jogador)
 
 grupo_inimigos.add(Virus())
 
+# Cria um relogio para o jogo
 clock = pygame.time.Clock()
 
 jogo_perdido = False
 
+''' Loop principal do jogo '''
 while loop:
 
+    # Ajusta a quantidade de inimigos com base na pontuação
     if pontos < 21:
         if q < 3:
             grupo_inimigos.add(Virus())
@@ -343,21 +367,23 @@ while loop:
     if pontos > 200:
         nivel = 10
 
-    clock.tick(120)
+    clock.tick(120) # controla o tempo de atualização da tela
 
     superficie.blit(fundo, (0,0))
 
+    ''' Eventos do jogo '''
     for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
+        if evento.type == pygame.QUIT: # Fechamento da janela
             loop = False
 
         if evento.type == pygame.KEYDOWN :
-            if evento.key == pygame.K_SPACE:
+            if evento.key == pygame.K_SPACE: # Se espaço foi pressionado
                 if powerUp_tiro_ativo:
                     jogador.atirar_triplo()
                 else:
                     jogador.atirar()
 
+    # Desenha e atualiza os grupos de sprites
     grupo_jogador.draw(superficie)
     grupo_jogador.update()
 
@@ -370,15 +396,18 @@ while loop:
     grupo_powerUp.draw(superficie)
     grupo_powerUp.update()
 
+    # Verifica a colisão entre jogador e power-up
     for powerup in grupo_powerUp:
         if pygame.sprite.collide_rect(jogador, powerup):
             powerup.kill()
             powerUp_tiro_ativo = True
             powerUp_tiro_timer = pygame.time.get_ticks()
 
+    # Desativa o power-up apos ceto tempo
     if powerUp_tiro_ativo and pygame.time.get_ticks() - powerUp_tiro_timer > 5000:
         powerUp_tiro_ativo = False
 
+    # Verifica as colisões entre os tiros e os inimigos
     for tiro in grupo_tiro:
         inimigos_atingidos = pygame.sprite.spritecollide(tiro, grupo_inimigos, True)
 
@@ -387,13 +416,16 @@ while loop:
             q -= 1
             pontos += 1
 
+    # Verifica se houve colisão entre o jogador e os inimigos
     colisoes = pygame.sprite.spritecollide(jogador, grupo_inimigos, False)
 
+    # Se hover colisão, o jogador perde o jogo
     if colisoes:
         loop = False
         game_over.executar()
         print(f'Pontuação: {pontos}')
 
+    # Exibe na tela a pontuação e o nivel do jogador
     texto_pontos = fonte.render(f'Pontos: {pontos}', True, 'white')
     texto_nivel = fonte.render(f'Nivel: {nivel}', True, (255, 255, 255))
 
@@ -402,4 +434,4 @@ while loop:
 
     pygame.display.update()
 
-print('Obrigado por jogar Invasão Espacial.') 
+print('Obrigado por jogar Invasão Espacial.')
