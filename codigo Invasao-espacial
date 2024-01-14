@@ -4,6 +4,7 @@ from random import randint, random
 
 print('Invasão Espacial, versão: 1.0')
 
+
 powerUp_tiro_ativo = False
 powerUp_tiro_timer = 0
 
