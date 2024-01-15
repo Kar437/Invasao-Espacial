@@ -3,11 +3,14 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.0')
+print('Invasão Espacial, versão: 1.1')
 
-# Variáveis de controle de power-up de tiro
+''' Variáveis de controle de power-up de tiro '''
 powerUp_tiro_ativo = False
 powerUp_tiro_timer = 0
+
+powerUp_velocidade_ativo = False
+powerUp_velocidade_timer = 0
 
 ''' Variáveis de controle do jogo '''
 q = 0           # Contador de inimigos
@@ -34,6 +37,8 @@ pygame.font.init()
 fonte = pygame.font.SysFont(None, 30)
 fonte_titulo = pygame.font.SysFont(None, 50)
 
+''' ~~~~~~~~POWER-UPs~~~~~~~~'''
+
 
 # Cria o Power-up de tiro tripo
 class PowerUp_tiro(Sprite):
@@ -42,12 +47,31 @@ class PowerUp_tiro(Sprite):
         self.image = pygame.image.load('Game-images/power-up.tiro.png')
         self.rect = self.image.get_rect(center=(randint(20, 800), 0))
         self.velocidade = 1
+        self.tipo = 'tiro'
 
     def update(self):
         self.rect.y += self.velocidade
 
         if self.rect.y > 600:
             self.kill()
+
+
+class PowerUp_velocidade(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load('Game-images/power-up_velocidade.png'), (108, 78))
+        self.rect = self.image.get_rect(center=(randint(20, 800), 0))
+        self.velocidade = 1
+        self.tipo = 'velocidade'
+
+    def update(self):
+        self.rect.y += self.velocidade
+
+        if self.rect.y > 600:
+            self.kill()
+
+
+''' ~~~~~~~~POWER-UPs~~~~~~~~'''
 
 
 # Cria a tela inicial do jogo
@@ -283,10 +307,18 @@ class Virus(Sprite):
             if len(grupo_powerUp) < 1 and powerUp_tiro_ativo == False:
                 self.gerar_powerUp_tiro()
 
+        if random() < 0.07:
+            if len(grupo_powerUp) < 1 and powerUp_velocidade_ativo == False:
+                self.gerar_powerUp_velocidade()
+
     # Método que gera o power-up de tiro
     def gerar_powerUp_tiro(self):
-        powerup = PowerUp_tiro()
-        grupo_powerUp.add(powerup)
+        powerup_tiro = PowerUp_tiro()
+        grupo_powerUp.add(powerup_tiro)
+
+    def gerar_powerUp_velocidade(self):
+        powerup_velocidade = PowerUp_velocidade()
+        grupo_powerUp.add(powerup_velocidade)
 
     def update(self):
         self.rect.y += self.velocidade
@@ -399,14 +431,23 @@ while loop:
     # Verifica a colisão entre jogador e power-up
     for powerup in grupo_powerUp:
         if pygame.sprite.collide_rect(jogador, powerup):
-            powerup.kill()
-            powerUp_tiro_ativo = True
-            powerUp_tiro_timer = pygame.time.get_ticks()
+            if powerup.tipo == 'tiro':
+                powerup.kill()
+                powerUp_tiro_ativo = True
+                powerUp_tiro_timer = pygame.time.get_ticks()
+            if powerup.tipo == 'velocidade':
+                powerup.kill()
+                powerUp_velocidade_ativo = True
+                powerUp_velocidade_timer = pygame.time.get_ticks()
+                jogador.velocidade = 8
 
     # Desativa o power-up apos ceto tempo
     if powerUp_tiro_ativo and pygame.time.get_ticks() - powerUp_tiro_timer > 5000:
         powerUp_tiro_ativo = False
 
+    if powerUp_velocidade_ativo and pygame.time.get_ticks() - powerUp_velocidade_timer > 5000:
+        powerUp_velocidade_ativo = False
+        jogador.velocidade = 3.5
     # Verifica as colisões entre os tiros e os inimigos
     for tiro in grupo_tiro:
         inimigos_atingidos = pygame.sprite.spritecollide(tiro, grupo_inimigos, True)
@@ -434,4 +475,4 @@ while loop:
 
     pygame.display.update()
 
-print('Obrigado por jogar Invasão Espacial.')
+print('Obrigado por jogar Invasão Espacial.') 
