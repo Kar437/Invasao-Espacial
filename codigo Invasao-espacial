@@ -5,7 +5,7 @@ from random import randint, random
 
 print('Invasão Espacial, versão: 1.1')
 
-''' Variáveis de controle de power-up de tiro '''
+''' Variáveis de controle de power-up '''
 powerUp_tiro_ativo = False
 powerUp_tiro_timer = 0
 
