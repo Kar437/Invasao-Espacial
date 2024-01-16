@@ -5,6 +5,13 @@ from random import randint, random
 
 print('Invasão Espacial, versão: 1.1')
 
+pygame.mixer.init()
+pygame.mixer.music.load('sons/Star Wars.mp3')
+som_tiro = pygame.mixer.Sound('sons/laser.wav')
+
+pygame.mixer_music.play(-1)
+
+
 ''' Variáveis de controle de power-up '''
 powerUp_tiro_ativo = False
 powerUp_tiro_timer = 0
@@ -270,6 +277,7 @@ class Jogador(Sprite):
         global tirosQ
         if len(self.tiros) < 3:
             self.tiros.add(Tiro(self.rect.centerx, self.rect.top))
+            som_tiro.play()
 
     # Método que faz o jogador atirar triplo (Quando powwer-up ativo)
     def atirar_triplo(self):
@@ -277,6 +285,7 @@ class Jogador(Sprite):
             self.tiros.add(Tiro(self.rect.centerx - 50, self.rect.top))
             self.tiros.add(Tiro(self.rect.centerx, self.rect.top))
             self.tiros.add(Tiro(self.rect.centerx + 50, self.rect.top))
+            som_tiro.play()
 
 
 # Cria o vírus (Inimigo)
@@ -329,7 +338,6 @@ class Virus(Sprite):
             global pontos
             q -= 1
             pontos -= 1
-
 
 # Cria grupos de sprites
 grupo_powerUp = Group()
@@ -475,4 +483,4 @@ while loop:
 
     pygame.display.update()
 
-print('Obrigado por jogar Invasão Espacial.') 
+print('Obrigado por jogar Invasão Espacial.')
