@@ -5,11 +5,12 @@ from random import randint, random
 
 print('Invasão Espacial, versão: 1.1')
 
+''' Controla os sons do jogo '''
 pygame.mixer.init()
-pygame.mixer.music.load('sons/Star Wars.mp3')
-som_tiro = pygame.mixer.Sound('sons/laser.wav')
+pygame.mixer.music.load('sons/Star Wars.mp3')       # Musica de fundo
+som_tiro = pygame.mixer.Sound('sons/laser.wav')     # Som do tiro
 
-pygame.mixer_music.play(-1)
+pygame.mixer_music.play(-1)     # Toca a musica
 
 
 ''' Variáveis de controle de power-up '''
@@ -18,6 +19,9 @@ powerUp_tiro_timer = 0
 
 powerUp_velocidade_ativo = False
 powerUp_velocidade_timer = 0
+
+powerUp_escudo_ativo = False
+powerUp_escudo_timer = 0
 
 ''' Variáveis de controle do jogo '''
 q = 0           # Contador de inimigos
@@ -70,6 +74,21 @@ class PowerUp_velocidade(Sprite):
         self.rect = self.image.get_rect(center=(randint(20, 800), 0))
         self.velocidade = 1
         self.tipo = 'velocidade'
+
+    def update(self):
+        self.rect.y += self.velocidade
+
+        if self.rect.y > 600:
+            self.kill()
+
+
+class PowerUp_escudo(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load('Game-images/power-up_escudos.png'), (108, 78))
+        self.rect = self.image.get_rect()
+        self.velocidade = 1
+        self.tipo = 'escudo'
 
     def update(self):
         self.rect.y += self.velocidade
@@ -287,6 +306,9 @@ class Jogador(Sprite):
             self.tiros.add(Tiro(self.rect.centerx + 50, self.rect.top))
             som_tiro.play()
 
+    def ativar_escudos(self):
+        ...
+
 
 # Cria o vírus (Inimigo)
 class Virus(Sprite):
@@ -320,6 +342,10 @@ class Virus(Sprite):
             if len(grupo_powerUp) < 1 and powerUp_velocidade_ativo == False:
                 self.gerar_powerUp_velocidade()
 
+        if random() < 0.03:
+            if len(grupo_powerUp) < 1 and powerUp_escudo_ativo == False:
+                self.gerar_powerUp_escudo()
+
     # Método que gera o power-up de tiro
     def gerar_powerUp_tiro(self):
         powerup_tiro = PowerUp_tiro()
@@ -328,6 +354,10 @@ class Virus(Sprite):
     def gerar_powerUp_velocidade(self):
         powerup_velocidade = PowerUp_velocidade()
         grupo_powerUp.add(powerup_velocidade)
+
+    def gerar_powerUp_escudo(self):
+        powerup_escudo = PowerUp_escudo()
+        grupo_powerUp.add(powerup_escudo)
 
     def update(self):
         self.rect.y += self.velocidade
@@ -439,15 +469,23 @@ while loop:
     # Verifica a colisão entre jogador e power-up
     for powerup in grupo_powerUp:
         if pygame.sprite.collide_rect(jogador, powerup):
+
             if powerup.tipo == 'tiro':
                 powerup.kill()
                 powerUp_tiro_ativo = True
                 powerUp_tiro_timer = pygame.time.get_ticks()
+
             if powerup.tipo == 'velocidade':
                 powerup.kill()
                 powerUp_velocidade_ativo = True
                 powerUp_velocidade_timer = pygame.time.get_ticks()
                 jogador.velocidade = 8
+
+            if powerup.tipo == 'escudo':
+                powerup.kill()
+                powerUp_escudo_ativo = True
+                powerUp_escudo_timer = pygame.time.get_ticks()
+                jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders_l.png'), (100, 100))
 
     # Desativa o power-up apos ceto tempo
     if powerUp_tiro_ativo and pygame.time.get_ticks() - powerUp_tiro_timer > 5000:
@@ -456,6 +494,11 @@ while loop:
     if powerUp_velocidade_ativo and pygame.time.get_ticks() - powerUp_velocidade_timer > 5000:
         powerUp_velocidade_ativo = False
         jogador.velocidade = 3.5
+
+    if powerUp_escudo_ativo and pygame.time.get_ticks() - powerUp_escudo_timer > 10000:
+        powerUp_escudo_ativo = False
+        jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders.png'), (80, 80))
+
     # Verifica as colisões entre os tiros e os inimigos
     for tiro in grupo_tiro:
         inimigos_atingidos = pygame.sprite.spritecollide(tiro, grupo_inimigos, True)
@@ -469,7 +512,7 @@ while loop:
     colisoes = pygame.sprite.spritecollide(jogador, grupo_inimigos, False)
 
     # Se hover colisão, o jogador perde o jogo
-    if colisoes:
+    if colisoes and not powerUp_escudo_ativo:
         loop = False
         game_over.executar()
         print(f'Pontuação: {pontos}')
