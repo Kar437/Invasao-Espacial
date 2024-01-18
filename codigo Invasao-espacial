@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.1')
+print('Invasão Espacial, versão: 1.2')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
@@ -133,6 +133,7 @@ class Como_jogar():
     def __init__(self):
         self.rodando = True
         self.voltar = Botao(esverdeado, 320, 500, 150, 50, 'Voltar')
+        self.guia = Botao(esverdeado, 480, 500, 70, 50, '>')
 
     def executar(self):
         while self.rodando:
@@ -155,6 +156,7 @@ class Como_jogar():
             superficie.blit(texto6, (50, 225))
 
             self.voltar.desenhar(superficie)
+            self.guia.desenhar(superficie)
 
             pygame.display.flip()
             for event in pygame.event.get():
@@ -164,7 +166,47 @@ class Como_jogar():
                     mouse_pos = pygame.mouse.get_pos()
                     if self.voltar.estar_sobre_pos(mouse_pos):
                         self.rodando = False
+                    if self.guia.estar_sobre_pos(mouse_pos):
+                        guia = Guia_powerUp()
+                        guia.executar()
 
+
+class Guia_powerUp():
+    def __init__(self):
+        self.rodando = True
+        self.voltar = Botao(esverdeado, 320, 500, 70, 50, '<')
+        self.PU_tiro = pygame.transform.scale(pygame.image.load('Game-images/power-up.tiro.png'), (70, 70))
+        self.PU_velocidade = pygame.transform.scale(pygame.image.load('Game-images/power-up_velocidade.png'), (70, 70))
+        self.PU_escudo = pygame.transform.scale(pygame.image.load('Game-images/power-up_escudos.png'), (70, 70))
+
+    def executar(self):
+        while self.rodando:
+            superficie.fill(preto)
+
+            titulo = fonte_titulo.render('POWER-UPs', True, 'white')
+            texto_tiro = fonte.render('Faz o jogador atirar três (3) projéteis simutaneamente. Dura 5 segundos.', True, 'White')
+            texto_velocidade = fonte.render('Aumenta a velocidade de movimento do jogador. Dura 5 segundos.', True, 'white')
+            texto_escudo = fonte.render('O jogador cria um escudo que o deixa invunerável. Dura 10 segundos. ', True, 'White')
+
+            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            superficie.blit(self.PU_tiro, (5, 125))
+            superficie.blit(texto_tiro, (70, 160))
+            superficie.blit(self.PU_velocidade, ( 7, 225))
+            superficie.blit(texto_velocidade, (70, 225))
+            superficie.blit(self.PU_escudo, (5, 325))
+            superficie.blit(texto_escudo, (70, 325))
+
+            self.voltar.desenhar(superficie)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.voltar.estar_sobre_pos(mouse_pos):
+                        self.rodando = False
 
 # Cria a tela de game-over
 class game_over():
