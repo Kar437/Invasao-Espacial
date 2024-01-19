@@ -171,6 +171,7 @@ class Como_jogar():
                         guia.executar()
 
 
+# Cria a aba de guia dos power-ups
 class Guia_powerUp():
     def __init__(self):
         self.rodando = True
@@ -191,10 +192,10 @@ class Guia_powerUp():
             superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
             superficie.blit(self.PU_tiro, (5, 125))
             superficie.blit(texto_tiro, (70, 160))
-            superficie.blit(self.PU_velocidade, ( 7, 225))
-            superficie.blit(texto_velocidade, (70, 225))
+            superficie.blit(self.PU_velocidade, ( 5, 225))
+            superficie.blit(texto_velocidade, (90, 240))
             superficie.blit(self.PU_escudo, (5, 325))
-            superficie.blit(texto_escudo, (70, 325))
+            superficie.blit(texto_escudo, (90, 340))
 
             self.voltar.desenhar(superficie)
 
@@ -207,6 +208,7 @@ class Guia_powerUp():
                     mouse_pos = pygame.mouse.get_pos()
                     if self.voltar.estar_sobre_pos(mouse_pos):
                         self.rodando = False
+
 
 # Cria a tela de game-over
 class game_over():
