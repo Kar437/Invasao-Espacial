@@ -15,7 +15,8 @@ pygame.mixer_music.play(-1)     # Toca a musica
 
 ''' Variáveis de controle de power-up '''
 powerUp_tiro_ativo = False
-powerUp_tiro_timer = 0  
+powerUp_tiro_timer = 0
+
 powerUp_velocidade_ativo = False
 powerUp_velocidade_timer = 0
 
@@ -170,6 +171,7 @@ class Como_jogar():
                         guia.executar()
 
 
+# Cria a aba de guia dos power-ups
 class Guia_powerUp():
     def __init__(self):
         self.rodando = True
@@ -190,10 +192,10 @@ class Guia_powerUp():
             superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
             superficie.blit(self.PU_tiro, (5, 125))
             superficie.blit(texto_tiro, (70, 160))
-            superficie.blit(self.PU_velocidade, ( 7, 225))
-            superficie.blit(texto_velocidade, (70, 225))
+            superficie.blit(self.PU_velocidade, ( 5, 225))
+            superficie.blit(texto_velocidade, (90, 240))
             superficie.blit(self.PU_escudo, (5, 325))
-            superficie.blit(texto_escudo, (70, 325))
+            superficie.blit(texto_escudo, (90, 340))
 
             self.voltar.desenhar(superficie)
 
@@ -206,6 +208,7 @@ class Guia_powerUp():
                     mouse_pos = pygame.mouse.get_pos()
                     if self.voltar.estar_sobre_pos(mouse_pos):
                         self.rodando = False
+
 
 # Cria a tela de game-over
 class game_over():
@@ -274,7 +277,7 @@ game_over = game_over()
 class Tiro(Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load('Game-images/laser_jp.png')
+        self.image = pygame.image.load('Game-images/laser.png')
         self.rect = self.image.get_rect(center=(x, y))
 
         self.rect.centerx = x
@@ -296,7 +299,7 @@ class Jogador(Sprite):
     def __init__(self, tiros):
         super().__init__()
 
-        self.image = pygame.transform.scale(pygame.image.load('Game-images/nave_jp.png'), (100, 100)) # Carrega a imagem do personagem
+        self.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders.png'), (80, 80)) # Carrega a imagem do personagem
         self.rect = self.image.get_rect() # Obtendo o retângulo delimitador da imagem.
 
         self.rect.centerx = tamanho_tela[0] // 2
@@ -347,6 +350,8 @@ class Jogador(Sprite):
             self.tiros.add(Tiro(self.rect.centerx + 50, self.rect.top))
             som_tiro.play()
 
+    def ativar_escudos(self):
+        ...
 
 
 # Cria o vírus (Inimigo)
@@ -408,12 +413,14 @@ class Virus(Sprite):
             q -= 1
             pontos -= 1
 
+
 # Cria grupos de sprites
 grupo_powerUp = Group()
 grupo_tiro = Group()
 grupo_inimigos = Group()
 jogador = Jogador(grupo_tiro)
 grupo_jogador = GroupSingle(jogador)
+grupo_asteroide = Group()
 
 grupo_inimigos.add(Virus())
 
@@ -505,6 +512,9 @@ while loop:
     grupo_powerUp.draw(superficie)
     grupo_powerUp.update()
 
+    grupo_asteroide.draw(superficie)
+    grupo_asteroide.update()
+
     # Verifica a colisão entre jogador e power-up
     for powerup in grupo_powerUp:
         if pygame.sprite.collide_rect(jogador, powerup):
@@ -524,7 +534,7 @@ while loop:
                 powerup.kill()
                 powerUp_escudo_ativo = True
                 powerUp_escudo_timer = pygame.time.get_ticks()
-                jogador.image = pygame.transform.scale(pygame.image.load('Game-images/nave_jp-escudo.png'), (125, 125))
+                jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders_l.png'), (100, 100))
 
     # Desativa o power-up apos ceto tempo
     if powerUp_tiro_ativo and pygame.time.get_ticks() - powerUp_tiro_timer > 5000:
@@ -536,7 +546,7 @@ while loop:
 
     if powerUp_escudo_ativo and pygame.time.get_ticks() - powerUp_escudo_timer > 10000:
         powerUp_escudo_ativo = False
-        jogador.image = pygame.transform.scale(pygame.image.load('Game-images/nave_jp.png'), (100, 100))
+        jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders.png'), (80, 80))
 
     # Verifica as colisões entre os tiros e os inimigos
     for tiro in grupo_tiro:
