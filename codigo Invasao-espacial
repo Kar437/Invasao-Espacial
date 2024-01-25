@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.4')
+print('Invasão Espacial, versão: 1.5')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
@@ -208,21 +208,26 @@ class Guia_powerUp():
                     if self.voltar.estar_sobre_pos(mouse_pos):
                         self.rodando = False
 
+
 # Cria a tela de game-over
 def mostrar_game_over():
     superficie.fill(preto)
 
     perdeu = fonte_titulo.render('Game over!', True, 'white')
     pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
+    mostra_nivel = fonte.render(f'Nível: {nivel}', True, 'white' )
 
     sair = Botao(esverdeado, 320, 470, 150, 50, 'Sair')
-    voltar = Botao(esverdeado, 320, 370, 150, 50, 'Voltar')
+    voltar = Botao(esverdeado, 320, 270, 150, 50, 'Jogar')
+    menu_ajuda = Botao(esverdeado, 320, 370, 150, 50, 'Ajuda')
 
     sair.desenhar(superficie)
     voltar.desenhar(superficie)
+    menu_ajuda.desenhar(superficie)
 
-    superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, tamanho_tela[1] // 2 - perdeu.get_width() // 2))
-    superficie.blit(pontuação, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 300))
+    superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, 25))
+    superficie.blit(pontuação, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 75))
+    superficie.blit(mostra_nivel, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 100))
 
     pygame.display.flip()
 
@@ -237,6 +242,8 @@ def mostrar_game_over():
                     return 'sair'
                 elif voltar.estar_sobre_pos(mouse_pos):
                     return 'voltar'
+                elif menu_ajuda.estar_sobre_pos(mouse_pos):
+                    return 'Ajuda'
 
 
 # classe que cria os botões
@@ -269,6 +276,7 @@ class Botao():
 tela_inicial = Tela_inicial()
 tela_inicial.executar()
 ajuda = Como_jogar()
+
 
 # Cria o tiro disparado pelo jogador
 class Tiro(Sprite):
@@ -346,7 +354,6 @@ class Jogador(Sprite):
             self.tiros.add(Tiro(self.rect.centerx, self.rect.top))
             self.tiros.add(Tiro(self.rect.centerx + 50, self.rect.top))
             som_tiro.play()
-
 
 
 # Cria o vírus (Inimigo)
@@ -569,8 +576,8 @@ while loop:
             jogador.rect.centerx = tamanho_tela[0] // 2
             jogador.rect.bottom = tamanho_tela[1] - 10
             loop = True
-
-    # ...
+        elif escolha_game_over == 'Ajuda':
+            ajuda.executar()
 
     # Exibe na tela a pontuação e o nivel do jogador
     texto_pontos = fonte.render(f'Pontos: {pontos}', True, 'white')
