@@ -28,6 +28,7 @@ q = 0           # Contador de inimigos
 nivel = 0       # Nivel do jogo
 pontos = 0      # Pontuação do jogador
 loop = True     # Variável que controla o loop principal do jogo
+recorde = 0
 
 ''' Cores utilizadas no jogo '''
 preto = (0, 0, 0)
@@ -211,11 +212,17 @@ class Guia_powerUp():
 
 # Cria a tela de game-over
 def mostrar_game_over():
+    global recorde
+
+    if pontos > recorde:
+        recorde = pontos
+        
     superficie.fill(preto)
 
     perdeu = fonte_titulo.render('Game over!', True, 'white')
     pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
     mostra_nivel = fonte.render(f'Nível: {nivel}', True, 'white' )
+    melhor_pontos = fonte.render(f'Melhor pontução: {recorde}', True, 'white')
 
     sair = Botao(esverdeado, 320, 470, 150, 50, 'Sair')
     voltar = Botao(esverdeado, 320, 270, 150, 50, 'Jogar')
@@ -228,6 +235,7 @@ def mostrar_game_over():
     superficie.blit(perdeu, (tamanho_tela[0] // 2 - perdeu.get_width() // 2, 25))
     superficie.blit(pontuação, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 75))
     superficie.blit(mostra_nivel, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 100))
+    superficie.blit(melhor_pontos, (tamanho_tela[0] // 2 - pontuação.get_width() // 2, 125))
 
     pygame.display.flip()
 
@@ -556,9 +564,6 @@ while loop:
 
     # Verifica se houve colisão entre o jogador e os inimigos
     colisoes = pygame.sprite.spritecollide(jogador, grupo_inimigos, False)
-
-    # Se hover colisão, o jogador perde o jogo
-    # ...
 
     # Se hover colisão, o jogador perde o jogo
     if colisoes and not powerUp_escudo_ativo:
