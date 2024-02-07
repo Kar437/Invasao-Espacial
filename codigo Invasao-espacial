@@ -3,15 +3,14 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.5')
+print('Invasão Espacial, versão: 1.5.1')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
-pygame.mixer.music.load('sons/Star Wars.mp3')       # Musica de fundo
-som_tiro = pygame.mixer.Sound('sons/laser.wav')     # Som do tiro
+pygame.mixer.music.load('sons/Star Wars.mp3')  # Musica de fundo
+som_tiro = pygame.mixer.Sound('sons/laser.wav')  # Som do tiro
 
-pygame.mixer_music.play(-1)     # Toca a musica
-
+pygame.mixer_music.play(-1)  # Toca a musica
 
 ''' Variáveis de controle de power-up '''
 powerUp_tiro_ativo = False
@@ -28,7 +27,7 @@ q = 0           # Contador de inimigos
 nivel = 0       # Nivel do jogo
 pontos = 0      # Pontuação do jogador
 loop = True     # Variável que controla o loop principal do jogo
-recorde = 0
+recorde = 0     # Variável que armazena a maior pontuação do jogador
 
 ''' Cores utilizadas no jogo '''
 preto = (0, 0, 0)
@@ -49,6 +48,7 @@ pygame.font.init()
 fonte = pygame.font.SysFont(None, 30)
 fonte_titulo = pygame.font.SysFont(None, 50)
 
+
 ''' ~~~~~~~~POWER-UPs~~~~~~~~'''
 
 
@@ -67,7 +67,7 @@ class PowerUp_tiro(Sprite):
         if self.rect.y > 600:
             self.kill()
 
-
+# Cria o Power-up de velocidade
 class PowerUp_velocidade(Sprite):
     def __init__(self):
         super().__init__()
@@ -83,6 +83,7 @@ class PowerUp_velocidade(Sprite):
             self.kill()
 
 
+# Cria o Power-up de escudo
 class PowerUp_escudo(Sprite):
     def __init__(self):
         super().__init__()
@@ -105,16 +106,18 @@ class PowerUp_escudo(Sprite):
 class Tela_inicial():
     def __init__(self):
         self.rodando = True
-        self.botão = Botao(esverdeado, 320, 355, 150, 50, 'Jogar')
-        self.ajuda = Botao(esverdeado, 320, 455, 150, 50, 'Ajuda')
+        self.botão = Botao(esverdeado, 320, 255, 150, 50, 'Jogar')
+        self.ajuda = Botao(esverdeado, 320, 355, 150, 50, 'Ajuda')
+        self.sair = Botao(esverdeado, 320, 455, 150, 50, 'Sair')
 
     def executar(self):
         while self.rodando:
             superficie.fill(preto)
             titulo = fonte_titulo.render("Invasão Espacial", True, 'white')
-            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            superficie.blit(titulo, (tamanho_tela[0] // 2 - titulo.get_width() // 2, 25))
             self.botão.desenhar(superficie)
             self.ajuda.desenhar(superficie)
+            self.sair.desenhar(superficie)
             pygame.display.flip()
 
             for evento in pygame.event.get():
@@ -127,6 +130,8 @@ class Tela_inicial():
                     if self.ajuda.estar_sobre_pos(mouse_pos):
                         como_jogar = Como_jogar()
                         como_jogar.executar()
+                    if self.sair.estar_sobre_pos(mouse_pos):
+                        quit()
 
 
 # cria a janela de ajuda do Menu principal do jogo
@@ -148,7 +153,7 @@ class Como_jogar():
             texto5 = fonte.render('-Quanto maior for sua pontuação, maior será a dificuldade;', True, 'white')
             texto6 = fonte.render('-Obejetivo: eliminar a maior quantidade de vírus possivel.', True, 'white')
 
-            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            superficie.blit(titulo, (tamanho_tela[0] // 2 - titulo.get_width() // 2, 25))
             superficie.blit(texto1, (50, 100))
             superficie.blit(texto2, (50, 125))
             superficie.blit(texto3, (50, 150))
@@ -185,14 +190,17 @@ class Guia_powerUp():
             superficie.fill(preto)
 
             titulo = fonte_titulo.render('POWER-UPs', True, 'white')
-            texto_tiro = fonte.render('Faz o jogador atirar três (3) projéteis simutaneamente. Dura 5 segundos.', True, 'White')
-            texto_velocidade = fonte.render('Aumenta a velocidade de movimento do jogador. Dura 5 segundos.', True, 'white')
-            texto_escudo = fonte.render('O jogador cria um escudo que o deixa invunerável. Dura 10 segundos. ', True, 'White')
+            texto_tiro = fonte.render('Faz o jogador atirar três (3) projéteis simutaneamente. Dura 5 segundos.', True,
+                                      'White')
+            texto_velocidade = fonte.render('Aumenta a velocidade de movimento do jogador. Dura 5 segundos.', True,
+                                            'white')
+            texto_escudo = fonte.render('O jogador cria um escudo que o deixa invunerável. Dura 10 segundos. ', True,
+                                        'White')
 
-            superficie.blit(titulo, (tamanho_tela[0]//2 - titulo.get_width()//2, 25))
+            superficie.blit(titulo, (tamanho_tela[0] // 2 - titulo.get_width() // 2, 25))
             superficie.blit(self.PU_tiro, (5, 125))
             superficie.blit(texto_tiro, (70, 160))
-            superficie.blit(self.PU_velocidade, ( 7, 225))
+            superficie.blit(self.PU_velocidade, (7, 225))
             superficie.blit(texto_velocidade, (70, 225))
             superficie.blit(self.PU_escudo, (5, 325))
             superficie.blit(texto_escudo, (70, 325))
@@ -216,12 +224,12 @@ def mostrar_game_over():
 
     if pontos > recorde:
         recorde = pontos
-        
+
     superficie.fill(preto)
 
     perdeu = fonte_titulo.render('Game over!', True, 'white')
     pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
-    mostra_nivel = fonte.render(f'Nível: {nivel}', True, 'white' )
+    mostra_nivel = fonte.render(f'Nível: {nivel}', True, 'white')
     melhor_pontos = fonte.render(f'Melhor pontução: {recorde}', True, 'white')
 
     sair = Botao(esverdeado, 320, 470, 150, 50, 'Sair')
@@ -312,8 +320,9 @@ class Jogador(Sprite):
     def __init__(self, tiros):
         super().__init__()
 
-        self.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders.png'), (80, 80)) # Carrega a imagem do personagem
-        self.rect = self.image.get_rect() # Obtendo o retângulo delimitador da imagem.
+        self.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders.png'),
+                                            (80, 80))  # Carrega a imagem do personagem
+        self.rect = self.image.get_rect()  # Obtendo o retângulo delimitador da imagem.
 
         self.rect.centerx = tamanho_tela[0] // 2
         self.rect.bottom = tamanho_tela[1] - 10
@@ -423,6 +432,7 @@ class Virus(Sprite):
             q -= 1
             pontos -= 1
 
+
 # Cria grupos de sprites
 grupo_powerUp = Group()
 grupo_tiro = Group()
@@ -491,17 +501,17 @@ while loop:
     if pontos > 200:
         nivel = 10
 
-    clock.tick(120) # controla o tempo de atualização da tela
+    clock.tick(120)  # controla o tempo de atualização da tela
 
-    superficie.blit(fundo, (0,0))
+    superficie.blit(fundo, (0, 0))
 
     ''' Eventos do jogo '''
     for evento in pygame.event.get():
-        if evento.type == pygame.QUIT: # Fechamento da janela
+        if evento.type == pygame.QUIT:  # Fechamento da janela
             loop = False
 
-        if evento.type == pygame.KEYDOWN :
-            if evento.key == pygame.K_SPACE: # Se espaço foi pressionado
+        if evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_SPACE:  # Se espaço foi pressionado
                 if powerUp_tiro_ativo:
                     jogador.atirar_triplo()
                 else:
@@ -539,7 +549,8 @@ while loop:
                 powerup.kill()
                 powerUp_escudo_ativo = True
                 powerUp_escudo_timer = pygame.time.get_ticks()
-                jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders_l.png'), (100, 100))
+                jogador.image = pygame.transform.scale(pygame.image.load('Game-images/space-invaders_l.png'),
+                                                       (100, 100))
 
     # Desativa o power-up apos ceto tempo
     if powerUp_tiro_ativo and pygame.time.get_ticks() - powerUp_tiro_timer > 5000:
