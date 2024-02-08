@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.5.1')
+print('Invasão Espacial, versão: 1.6')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
@@ -132,6 +132,38 @@ class Tela_inicial():
                         como_jogar.executar()
                     if self.sair.estar_sobre_pos(mouse_pos):
                         quit()
+
+
+class Pausa():
+    def __init__(self):
+        self.continuar = Botao(esverdeado, 320, 355, 170, 50, 'Continuar')
+        self.sair = Botao(esverdeado, 320, 455, 170, 50, 'Sair')
+        self.rodando = False
+
+    def executar(self):
+        self.rodando = True
+        while self.rodando:
+            superficie.fill(preto)
+            titulo = fonte_titulo.render('Jogo Pausado', True, 'white')
+            superficie.blit(titulo, (tamanho_tela[0] // 2 - titulo.get_width() // 2, 25))
+
+            self.sair.desenhar(superficie)
+            self.continuar.desenhar(superficie)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.continuar.estar_sobre_pos(mouse_pos):
+                        self.rodando = False
+                    if self.sair.estar_sobre_pos(mouse_pos):
+                        quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.rodando = False
 
 
 # cria a janela de ajuda do Menu principal do jogo
@@ -440,6 +472,8 @@ grupo_inimigos = Group()
 jogador = Jogador(grupo_tiro)
 grupo_jogador = GroupSingle(jogador)
 
+menu_pausa = Pausa()
+
 grupo_inimigos.add(Virus())
 
 # Cria um relogio para o jogo
@@ -516,6 +550,8 @@ while loop:
                     jogador.atirar_triplo()
                 else:
                     jogador.atirar()
+            if evento.key == pygame.K_ESCAPE:
+                menu_pausa.executar()
 
     # Desenha e atualiza os grupos de sprites
     grupo_jogador.draw(superficie)
