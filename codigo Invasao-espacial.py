@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.6')
+print('Invasão Espacial, versão: 1.6.1')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
@@ -112,7 +112,8 @@ class Tela_inicial():
 
     def executar(self):
         while self.rodando:
-            superficie.fill(preto)
+            tela = pygame.image.load('Game-images/tela.jpg')
+            superficie.blit(tela, (0, 0))
             titulo = fonte_titulo.render("Invasão Espacial", True, 'white')
             superficie.blit(titulo, (tamanho_tela[0] // 2 - titulo.get_width() // 2, 25))
             self.botão.desenhar(superficie)
@@ -134,6 +135,7 @@ class Tela_inicial():
                         quit()
 
 
+# Cria o menu de pausa do jogo
 class Pausa():
     def __init__(self):
         self.continuar = Botao(esverdeado, 320, 355, 170, 50, 'Continuar')
@@ -257,7 +259,8 @@ def mostrar_game_over():
     if pontos > recorde:
         recorde = pontos
 
-    superficie.fill(preto)
+    tela = pygame.image.load('Game-images/tela.jpg')
+    superficie.blit(tela, (0, 0))
 
     perdeu = fonte_titulo.render('Game over!', True, 'white')
     pontuação = fonte.render(f'Pontuação: {pontos}', True, 'white')
@@ -324,6 +327,8 @@ class Botao():
 tela_inicial = Tela_inicial()
 tela_inicial.executar()
 ajuda = Como_jogar()
+menu_pausa = Pausa()
+
 
 
 # Cria o tiro disparado pelo jogador
@@ -446,10 +451,12 @@ class Virus(Sprite):
         powerup_tiro = PowerUp_tiro()
         grupo_powerUp.add(powerup_tiro)
 
+    # Método que gera o power-up de velocidade
     def gerar_powerUp_velocidade(self):
         powerup_velocidade = PowerUp_velocidade()
         grupo_powerUp.add(powerup_velocidade)
 
+    # Método que gera o power-up de escudo
     def gerar_powerUp_escudo(self):
         powerup_escudo = PowerUp_escudo()
         grupo_powerUp.add(powerup_escudo)
@@ -471,8 +478,6 @@ grupo_tiro = Group()
 grupo_inimigos = Group()
 jogador = Jogador(grupo_tiro)
 grupo_jogador = GroupSingle(jogador)
-
-menu_pausa = Pausa()
 
 grupo_inimigos.add(Virus())
 
