@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite, Group, GroupSingle
 from random import randint, random
 
-print('Invasão Espacial, versão: 1.6.1')
+print('Invasão Espacial, versão: 1.6.2')
 
 ''' Controla os sons do jogo '''
 pygame.mixer.init()
@@ -42,6 +42,8 @@ pygame.display.set_caption('Invasão Espacial')
 
 # Carrega a imagem do fundo do jogo
 fundo = pygame.transform.scale(pygame.image.load('Game-images/space.jpg'), tamanho_tela)
+
+botão = pygame.image.load('Game-images/botão.png')
 
 # Cria as fontes utilizadas no jogo
 pygame.font.init()
@@ -235,9 +237,9 @@ class Guia_powerUp():
             superficie.blit(self.PU_tiro, (5, 125))
             superficie.blit(texto_tiro, (70, 160))
             superficie.blit(self.PU_velocidade, (7, 225))
-            superficie.blit(texto_velocidade, (70, 225))
+            superficie.blit(texto_velocidade, (80, 255))
             superficie.blit(self.PU_escudo, (5, 325))
-            superficie.blit(texto_escudo, (70, 325))
+            superficie.blit(texto_escudo, (80, 355))
 
             self.voltar.desenhar(superficie)
 
@@ -296,7 +298,6 @@ def mostrar_game_over():
                 elif menu_ajuda.estar_sobre_pos(mouse_pos):
                     return 'Ajuda'
 
-
 # classe que cria os botões
 class Botao():
     def __init__(self, cor, x, y, largura, altura, texto=''):
@@ -309,10 +310,10 @@ class Botao():
 
     # Método para desenhar os botões na tela
     def desenhar(self, superficie):
-        pygame.draw.rect(superficie, self.cor, (self.x, self.y, self.largura, self.altura))
+        superficie.blit(botão, (self.x, self.y))
         if self.texto != '':
-            fonte_botao = pygame.font.SysFont(None, 50)
-            texto = fonte_botao.render(self.texto, 1, 'green')
+            fonte_botao = pygame.font.SysFont(None, 70)
+            texto = fonte_botao.render(self.texto, False, 'green')
             superficie.blit(texto, (self.x + (self.largura / 2 - texto.get_width() / 2),
                                     self.y + (self.altura / 2 - texto.get_height() / 2)))
 
@@ -328,7 +329,6 @@ tela_inicial = Tela_inicial()
 tela_inicial.executar()
 ajuda = Como_jogar()
 menu_pausa = Pausa()
-
 
 
 # Cria o tiro disparado pelo jogador
